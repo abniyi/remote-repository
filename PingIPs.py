@@ -4,8 +4,28 @@
 import os
 import time
 import sys
-#from netaddr import *
-class pingips():
+from netaddr import *
+from threading import Thread
+
+def validateIP(newIp):
+    validateIP = IPNetwork(newIp)
+    if validateIP:
+       status = True
+       print "====== Validation Result ========"
+       print "Ip Address: %s" % str(validateIP.ip)
+       print "Network Address: %s" % str(validateIP.network)
+       print "Broadcast: %s" % str(validateIP.broadcast)
+       print "Netmask: %s" % str(validateIP.netmask)
+       print "Size: %s" % str(validateIP.size)
+       print "================================"
+       return True
+
+    else :
+       print "Error: Invalid Address Given!"
+       return False
+
+
+class pingips(Thread):
   """
     This script report on the status of an ip address or range of ip addresses
     return active, if the ip address is up and running and inactive otherwise
@@ -13,62 +33,49 @@ class pingips():
     address use the CIDR notation for example python PingIPs.py 192.168.3.56/27
  
     This script calculates the range of IPs available for this IP and 
-    subnet mask, network base address and broadcast address
+    subnet mask, network base address and broadcast address using google netaddr by
+    David P.D Moss. 
+    Note: Thread has been used to speed up the process but the result doesn't return sequentially
   """
   newIp = None
-  rangeCIDR=None
+  status = False
+  parameter = ("Active", "Inactive", "No response")
+  newline = ""
   def __init__(self, ip):
+     Thread.__init__(self) # thread has been used to speed up the process
      self.newIp=ip
-     self.validateIP()
-  # validate that the ip given by convert it to binary
-  def validateIP(self):
-     pos = self.newIp.find("/")
-     octets=None
-     if pos != -1:
-	octets= self.newIp[:pos]
-	self.rangeCIDR=self.newIp[pos:]    
-     try:
-        self.ip2binary(self.newIp)
-     except Exception, err:
-        print "Error when converting to binary, ip not in the right format"
-     return "Ip is in the right format"
+    
+  def run(self):
+      cmd = "ping -c 2 " + self.newIp
+      outp = os.popen(cmd, "r")
+      for line in outp.readlines():
+	self.newline+=line
+      if "ttl" in self.newline:
+	print "IP: %s => %s" % (self.newIp, self.parameter[0])
+      elif "Unreachable" in self.newline:
+        print "IP: %s => %s" % (self.newIp, self.parameter[1])
+      else:
+        print "IP: %s => %s" % (self.newIp, self.parameter[2])
+
   
-  # convert an IP address from its 32 binary digit representation
-  def ip2binary(ip):
-     binlist=""
-     count=0
-     try:
-        octets = ip.split(".")
-        for octet in octets:
-           if octet != "":
-               binlist+=decimal2binary(int(octet),8)
-	       count+=1
-               if count == 4:
-                  break
-            
-        while count < 4:
-             binlist += "00000000"
-	     count +=1
-     return binlist
-
-   # convert a decimal number to binary rep
-   
-  def decimal2binary(num, digits=None):
-     
-
 
 
 if __name__=='__main__':
    # this only accepts an argument
    try:
      newIP = sys.argv[1]
-     newIP = "192.168.1.1/25"
-     result = pingips(newIP)
+     check = validateIP(newIP)
+     ip_list = list(IPNetwork(newIP))
+     if check:
+       for ip in ip_list:
+	  ip = str(ip)
+          ipPingResult = pingips(ip)
+          ipPingResult.start()
      
    except Exception,err:
      print " read the documentation for help on how to run the script"
      print err
-#     sys.exit()
+     sys.exit()
 
 
    
