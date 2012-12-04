@@ -6,6 +6,8 @@ import time
 import sys
 from netaddr import *
 from threading import Thread
+import optparse
+
 
 def validateIP(newIp):
     validateIP = IPNetwork(newIp)
@@ -23,8 +25,6 @@ def validateIP(newIp):
     else :
        print "Error: Invalid Address Given!"
        return False
-
-
 class pingips(Thread):
   """
     This script report on the status of an ip address or range of ip addresses
@@ -56,26 +56,32 @@ class pingips(Thread):
         print "IP: %s => %s" % (self.newIp, self.parameter[1])
       else:
         print "IP: %s => %s" % (self.newIp, self.parameter[2])
+ 
+
 
   
-
+def main():
+    """ Runs program and handles command line options"""
+    optOutput = optparse.OptionParser(description = ' check if an IP or range of IP address(es) are actives in inactives',
+					    prog='PingIPs',
+					    version = 'PingIps 3.0',
+					    usage =' example: %prog [192.168.3.1 or 192.168.3.0/24]')
+    options, args = optOutput.parse_args()
+    if len(args) == 1:
+        newIP = sys.argv[1]
+	check = validateIP(newIP)
+	ip_list = list(IPNetwork(newIP))
+     	if check:
+      	  for ip in ip_list:
+	    ip = str(ip)
+	    ipPingResult = pingips(ip)
+            ipPingResult.start()
+    else:
+	p.print_help()
+	
 
 if __name__=='__main__':
-   # this only accepts an argument
-   try:
-     newIP = sys.argv[1]
-     check = validateIP(newIP)
-     ip_list = list(IPNetwork(newIP))
-     if check:
-       for ip in ip_list:
-	  ip = str(ip)
-          ipPingResult = pingips(ip)
-          ipPingResult.start()
-     
-   except Exception,err:
-     print " read the documentation for help on how to run the script"
-     print err
-     sys.exit()
+   main()
 
 
    
