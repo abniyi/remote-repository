@@ -69,8 +69,12 @@ def main():
     options, args = optOutput.parse_args()
     if len(args) == 1:
         newIP = sys.argv[1]
-	check = validateIP(newIP)
-	ip_list = list(IPNetwork(newIP))
+	try:
+	  check = validateIP(newIP)
+	  ip_list = list(IPNetwork(newIP))
+	except Exception, err:
+	   print "Error, Invalid Ip Address"
+           sys.exit()
      	if check:
       	  for ip in ip_list:
 	    ip = str(ip)
