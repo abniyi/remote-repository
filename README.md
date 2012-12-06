@@ -7,7 +7,9 @@ It also validate the IP or IP range by printing the IP address, Network Address,
 Usage:
 ------------------------------------------------------------------------
 $python PingIPs.py 192.168.1.1 # test for single IP address
+
 or
+
 $python PingIPs.py 192.168.3.56/27 # test for range of IP address
 Requirement:
 ----------------------------------------------------------------------
@@ -24,6 +26,9 @@ Netmask: 255.255.255.255
 Size: 4
 ==============================
 IP: 192.168.3.0 => No response
+
 IP: 192.168.3.1 => Active
+
 IP: 192.168.3.2 => Inactive
+
 IP: 192.168.3.3 => Inactive
