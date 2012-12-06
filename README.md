@@ -6,9 +6,10 @@ It also validate the IP or IP range by printing the IP address, Network Address,
    Netmask, Size
 Usage:
 ------------------------------------------------------------------------
-#python PingIPs.py 192.168.1.1 # test for single IP address
+$python PingIPs.py 192.168.1.1 # test for single IP address
 or
-#python PingIPs.py 192.168.3.56/27 # test for range of IP address
+
+$python PingIPs.py 192.168.3.56/27 # test for range of IP address
 
 Requirement:
 ----------------------------------------------------------------------
@@ -18,7 +19,7 @@ Output:
 ----------------------------------------------------------------------------
 Each Ip is running in parallel using a thread for optimisation purpose, however the result doesn't return sequentially
 
-#python PingIPs.py 192.168.3.0/30
+$python PingIPs.py 192.168.3.0/30
 ======Validation Result=======
 IP Address: 192.168.3.0
 Network Address: 192.168.3.0
