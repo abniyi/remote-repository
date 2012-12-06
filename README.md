@@ -17,14 +17,20 @@ This script require the use of netaddr written by David P.D Moss module to be in
 Output:
 ----------------------------------------------------------------------------
 Each Ip is running in parallel using a thread for optimisation purpose, however the result doesn't return sequentially
+
 $python PingIPs.py 192.168.3.0/30
-======Validation Result=======
+
+-------Validation Result------
 IP Address: 192.168.3.0
+
 Network Address: 192.168.3.0
+
 Broadcast: 192.168.3.3
+
 Netmask: 255.255.255.255
+
 Size: 4
-==============================
+--------------------------------
 IP: 192.168.3.0 => No response
 
 IP: 192.168.3.1 => Active
