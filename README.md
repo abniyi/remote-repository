@@ -21,6 +21,7 @@ Each Ip is running in parallel using a thread for optimisation purpose, however 
 $python PingIPs.py 192.168.3.0/30
 
 -------Validation Result------
+
 IP Address: 192.168.3.0
 
 Network Address: 192.168.3.0
