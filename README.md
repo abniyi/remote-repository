@@ -7,18 +7,13 @@ It also validate the IP or IP range by printing the IP address, Network Address,
 Usage:
 ------------------------------------------------------------------------
 $python PingIPs.py 192.168.1.1 # test for single IP address
-or
-
 $python PingIPs.py 192.168.3.56/27 # test for range of IP address
-
 Requirement:
 ----------------------------------------------------------------------
 This script require the use of netaddr written by David P.D Moss module to be installed
-
 Output:
 ----------------------------------------------------------------------------
 Each Ip is running in parallel using a thread for optimisation purpose, however the result doesn't return sequentially
-
 $python PingIPs.py 192.168.3.0/30
 ======Validation Result=======
 IP Address: 192.168.3.0
