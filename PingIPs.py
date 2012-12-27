@@ -72,8 +72,8 @@ def main():
     """ Runs program and handles command line options"""
     optOutput = optparse.OptionParser(description = ' check if an IP or range of IP address(es) are active or inactive',
 					    prog='PingIPs',
-					    version = 'PingIps 3.0',
-					    usage =' example:python PingIPs.py  192.168.3.1 or 192.168.3.0/24')
+					    version = 'PingIps 4.0',
+					    usage =' example:$python PingIPs.py  192.168.3.1 or 192.168.3.0/24')
     options, args = optOutput.parse_args()
     if len(args) == 1:
         newIP = sys.argv[1]
