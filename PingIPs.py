@@ -4,15 +4,26 @@
 import os
 import time
 import sys
-from netaddr import *
+from netaddr import IPNetwork
 from threading import Thread
 import optparse
-
-
+import Queue
+import subprocess
+"""
+    This script report on the status of an ip address or range of ip addresses
+    return active, if the ip address is up and running and inactive otherwise
+    For a single ip address, just write python PingIPs.py 192.168.1.1 and for range of
+    address use the CIDR notation for example python PingIPs.py 192.168.3.56/27
+ 
+    This script calculates the range of IPs available for this IP and 
+    subnet mask, network base address and broadcast address using netaddr by
+    David P.D Moss. 
+    Note: Thread has been used to speed up the process but the result doesn't return sequentially
+"""
 def validateIP(newIp):
     validateIP = IPNetwork(newIp)
+    status = False
     if validateIP:
-       status = True
        print "====== Validation Result ========"
        print "Ip Address: %s" % str(validateIP.ip)
        print "Network Address: %s" % str(validateIP.network)
@@ -20,52 +31,49 @@ def validateIP(newIp):
        print "Netmask: %s" % str(validateIP.netmask)
        print "Size: %s" % str(validateIP.size)
        print "================================"
-       return True
+       status = True
+       return status
 
     else :
        print "Error: Invalid Address Given!"
-       return False
+       return status
+
+queue = Queue.Queue()
 class pingips(Thread):
-  """
-    This script report on the status of an ip address or range of ip addresses
-    return active, if the ip address is up and running and inactive otherwise
-    For a single ip address, just write python PingIPs.py 192.168.1.1 and for range of
-    address use the CIDR notation for example python PingIPs.py 192.168.3.56/27
- 
-    This script calculates the range of IPs available for this IP and 
-    subnet mask, network base address and broadcast address using google netaddr by
-    David P.D Moss. 
-    Note: Thread has been used to speed up the process but the result doesn't return sequentially
-  """
+  
   newIp = None
   status = False
   parameter = ("Active", "Inactive", "No response")
   newline = ""
-  def __init__(self, ip):
+  returnCodeTotal=None
+  def __init__(self, queue):
      Thread.__init__(self) # thread has been used to speed up the process
-     self.newIp=ip
-    
+     self.queue = queue
   def run(self):
-      cmd = "ping -c 2 " + self.newIp
-      outp = os.popen(cmd, "r")
-      for line in outp.readlines():
-	self.newline+=line
-      if "ttl" in self.newline:
-	print "IP: %s => %s" % (self.newIp, self.parameter[0])
-      elif "Unreachable" in self.newline:
-        print "IP: %s => %s" % (self.newIp, self.parameter[1])
-      else:
-        print "IP: %s => %s" % (self.newIp, self.parameter[2])
- 
+      while True:
+        newIP = self.queue.get() # grap the next ip on the queue
+        cmd = "ping -c 1 " + newIP
+        process = subprocess.Popen(cmd,shell=True,stdout=subprocess.PIPE)
+        process.wait()
+        returnCodeTotal = process.returncode
+        if returnCodeTotal == 0:
+	  print "IP: processed by %s [%s => %s]" % (self.getName(),newIP, self.parameter[0])
+        elif returnCodeTotal == 1:
+          print "IP: processed by %s [%s => %s]" % (self.getName(), newIP, self.parameter[1])
+        else:
+          print "IP: processed by %s [%s => %s]" % (self.getName(), newIP, self.parameter[2])
+       
+        #signals to queue job is done
+        self.queue.task_done() 
 
 
   
 def main():
     """ Runs program and handles command line options"""
-    optOutput = optparse.OptionParser(description = ' check if an IP or range of IP address(es) are actives in inactives',
+    optOutput = optparse.OptionParser(description = ' check if an IP or range of IP address(es) are active or inactive',
 					    prog='PingIPs',
 					    version = 'PingIps 3.0',
-					    usage =' example: %prog [192.168.3.1 or 192.168.3.0/24]')
+					    usage =' example:python PingIPs.py  192.168.3.1 or 192.168.3.0/24')
     options, args = optOutput.parse_args()
     if len(args) == 1:
         newIP = sys.argv[1]
@@ -76,12 +84,16 @@ def main():
 	   print "Error, Invalid Ip Address"
            sys.exit()
      	if check:
+          for i in range(10):
+            t = pingips(queue)
+            t.setDaemon(True)
+            t.start()
       	  for ip in ip_list:
-	    ip = str(ip)
-	    ipPingResult = pingips(ip)
-            ipPingResult.start()
+            queue.put(str(ip))
+          
+	  queue.join()
     else:
-	p.print_help()
+	optOutput.print_help()
 	
 
 if __name__=='__main__':
@@ -89,4 +101,3 @@ if __name__=='__main__':
 
 
    
-
