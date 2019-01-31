@@ -1,7 +1,7 @@
 Notice:
 --------------------------------------------------------------------------
 This simple script report on the status of an IP address or range of IP Addresses.
-It return active, the the ping is successful and the IP is up and running and inactive otherwise.
+It return active, if the ping is successful and the IP is up and running and inactive otherwise.
 It also validate the IP or IP range by printing the IP address, Network Address, Broadcast Address
    Netmask, Size
 Usage:
